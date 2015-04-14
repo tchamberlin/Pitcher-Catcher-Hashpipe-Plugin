@@ -8,11 +8,14 @@ AM_CPPFLAGS += -I"@HASHPIPE_INCDIR@"
 AM_CFLAGS = -ggdb -fPIC -O3 -Wall -Werror -fno-strict-aliasing -mavx
 
 # Convenience variables to group source files
+hello_world_databuf = hello_world_databuf.h \
+	        hello_world_databuf.c
+
 hello_world = hello_world_thread.c
 
 # This is the paper_gpu plugin itself
 lib_LTLIBRARIES = hello_world.la
-hello_world_la_SOURCES = $(hello_world)
+hello_world_la_SOURCES = $(hello_world) $(hello_world_databuf)
 hello_world_la_LIBADD   = -lrt
 hello_world_la_LDFLAGS  = -avoid-version -module -shared -export-dynamic
 # hello_world_la_LDFLAGS += -L"@XGPU_LIBDIR@" -Wl,-rpath,"@XGPU_LIBDIR@"
