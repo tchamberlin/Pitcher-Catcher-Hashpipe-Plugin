@@ -54,7 +54,7 @@ static void *run(hashpipe_thread_args_t * args)
 
 		int i;
 		
-		for (i = 0; i < 8; i++) {
+		for (i = 0; i < 7; i++) {
 			db->block[block_idx].header.potato = 5;
 			db->block[block_idx].header.butterscotch = 6;
 		}
@@ -62,12 +62,12 @@ static void *run(hashpipe_thread_args_t * args)
 		
 		uint64_t *data = db->block[block_idx].data;
 		fprintf(stderr, "sizeof data: %lu\n", sizeof (*data));
-// 		memset(data, 3, 8 * sizeof (uint64_t));
+// 		memset(data, 0, 8 * sizeof (uint64_t));
 		
 		
-// 		for (i = 0; i < 8; i++) {
-// 			data[i] = 7;
-// 		}
+		for (i = 0; i < 7; i++) {
+			data[i] = 7;
+		}
 
 		// Mark block as full
         hello_world_output_databuf_set_filled(db, block_idx);
