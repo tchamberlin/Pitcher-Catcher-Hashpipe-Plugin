@@ -15,12 +15,12 @@
 
 static void *run(hashpipe_thread_args_t * args)
 {
-	paper_input_databuf_t *db = (paper_input_databuf_t *)args->obuf;
+	hello_world_output_databuf_t *db = (hello_world_output_databuf_t *)args->obuf;
 	hashpipe_status_t st = args->st;
 	const char * status_key = args->thread_desc->skey;
 
 	int rv;
-	uint64_t mcnt = 0;
+// 	uint64_t mcnt = 0;
 //     uint64_t *data;
 //     int m,f,t,c;
 	int block_idx = 0;
@@ -34,37 +34,50 @@ static void *run(hashpipe_thread_args_t * args)
         hputs(st.buf, status_key, "waiting");
         hashpipe_status_unlock_safe(&st);
 
+		while ((rv=hello_world_output_databuf_wait_free(db, block_idx)) != HASHPIPE_OK) {
+              if (rv==HASHPIPE_TIMEOUT) {
+                  hashpipe_status_lock_safe(&st);
+                  hputs(st.buf, status_key, "blocked");
+                  hashpipe_status_unlock_safe(&st);
+                  continue;
+              } else {
+                  hashpipe_error(__FUNCTION__, "error waiting for free databuf");
+                  pthread_exit(NULL);
+                  break;
+              }
+          }
 
-		
-
-		while ((rv=paper_input_databuf_wait_free(db, block_idx))
-                != HASHPIPE_OK)
-		{
-            if (rv==HASHPIPE_TIMEOUT) {
-                hashpipe_status_lock_safe(&st);
-                hputs(st.buf, status_key, "blocked");
-                hashpipe_status_unlock_safe(&st);
-                continue;
-            } else {
-                hashpipe_error(__FUNCTION__, "error waiting for free databuf");
-                pthread_exit(NULL);
-                break;
-            }
-        }
-// 
-// 
 		hashpipe_status_lock_safe(&st);
 		hputs(st.buf, status_key, "receiving");
 		hputi4(st.buf, "NETBKOUT", block_idx);
 		hashpipe_status_unlock_safe(&st);
-// 
+
 		int i;
-		// Fill in sub-block headers
-		for(i=0; i<8; i++) {
-			db->block[block_idx].header.good_data = 1;
-			db->block[block_idx].header.mcnt = mcnt;
-			mcnt+=8;
+		
+		for (i = 0; i < 8; i++) {
+			db->block[block_idx].header.potato = 5;
+			db->block[block_idx].header.butterscotch = 6;
 		}
+
+		
+		uint64_t *data = db->block[block_idx].data;
+		fprintf(stderr, "sizeof data: %lu\n", sizeof (*data));
+// 		memset(data, 3, 8 * sizeof (uint64_t));
+		
+		
+// 		for (i = 0; i < 8; i++) {
+// 			data[i] = 7;
+// 		}
+
+		// Mark block as full
+        hello_world_output_databuf_set_filled(db, block_idx);
+
+        // Setup for next block
+        block_idx = (block_idx + 1) % db->header.n_block;
+		fprintf(stderr, "block_idx is now: %d\n", block_idx);
+
+        /* Will exit if thread has been cancelled */
+        pthread_testcancel();
 	}
 	
 	return NULL;
@@ -76,7 +89,7 @@ static hashpipe_thread_desc_t hello_world_thread = {
     init: NULL,
     run:  run,
     ibuf_desc: {NULL},
-    obuf_desc: {paper_input_databuf_create}
+    obuf_desc: {hello_world_output_databuf_create}
 };
 
 static __attribute__((constructor)) void ctor()
