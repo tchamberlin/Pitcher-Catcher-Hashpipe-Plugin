@@ -18,10 +18,9 @@
 hashpipe_databuf_t *hello_world_output_databuf_create(int instance_id, int databuf_id)
 {
     /* Calc databuf sizes */
-    size_t header_size = sizeof(hashpipe_databuf_t)
-                       + sizeof(hashpipe_databuf_cache_alignment);
-    size_t block_size  = sizeof(hello_world_output_block_t);
-    int    n_block = 8;
+    size_t header_size = sizeof(hashpipe_databuf_t);
+    size_t block_size  = sizeof(int) * 5 + sizeof(int) * 6;
+    int    n_block = 1;
 
     return hashpipe_databuf_create(
         instance_id, databuf_id, header_size, block_size, n_block);

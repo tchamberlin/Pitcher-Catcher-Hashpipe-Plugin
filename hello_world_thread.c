@@ -52,29 +52,23 @@ static void *run(hashpipe_thread_args_t * args)
 		hputi4(st.buf, "NETBKOUT", block_idx);
 		hashpipe_status_unlock_safe(&st);
 
-		int i;
-		
-		for (i = 0; i < 7; i++) {
-			db->block[block_idx].header.potato = 5;
-			db->block[block_idx].header.butterscotch = 6;
-		}
+		db->one = 1;
+		db->two = 2;
+		db->three = 3;
+		db->four = 4;
+		db->five = 5;
 
-		
-		uint64_t *data = db->block[block_idx].data;
-		fprintf(stderr, "sizeof data: %lu\n", sizeof (*data));
-// 		memset(data, 0, 8 * sizeof (uint64_t));
-		
-		
-		for (i = 0; i < 7; i++) {
-			data[i] = 7;
+		int i;
+		for (i = 0; i < 6; i++) {
+			db->six[i] = 6;
 		}
 
 		// Mark block as full
         hello_world_output_databuf_set_filled(db, block_idx);
 
         // Setup for next block
-        block_idx = (block_idx + 1) % db->header.n_block;
-		fprintf(stderr, "block_idx is now: %d\n", block_idx);
+//         block_idx = (block_idx + 1) % 8;
+// 		fprintf(stderr, "block_idx is now: %d\n", block_idx);
 
         /* Will exit if thread has been cancelled */
         pthread_testcancel();

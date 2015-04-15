@@ -4,39 +4,16 @@
 #include <stdint.h>
 #include "hashpipe_databuf.h"
 #include "config.h"
-
-#define CACHE_ALIGNMENT (128)
-
-// Used to pad after hashpipe_databuf_t to maintain cache alignment
-typedef uint8_t hashpipe_databuf_cache_alignment[
-  CACHE_ALIGNMENT - (sizeof(hashpipe_databuf_t)%CACHE_ALIGNMENT)
-];
-
-/*
- * OUTPUT BUFFER STRUCTURES
- */
-
-// #define N_OUTPUT_BLOCKS 2
-
-typedef struct hello_world_output_header {
-  uint64_t potato;
-  uint64_t butterscotch;
-} hello_world_output_header_t;
-
-typedef uint8_t hello_world_output_header_cache_alignment[
-  CACHE_ALIGNMENT - (sizeof(hello_world_output_header_t)%CACHE_ALIGNMENT)
-];
-
-typedef struct hello_world_output_block {
-  hello_world_output_header_t header;
-  hello_world_output_header_cache_alignment padding; // Maintain cache alignment
-  uint64_t data[8];
-} hello_world_output_block_t;
+#define CACHE_ALIGNMENT 128
 
 typedef struct hello_world_output_databuf {
   hashpipe_databuf_t header;
-  hashpipe_databuf_cache_alignment padding; // Maintain cache alignment
-  hello_world_output_block_t block[8];
+  int one;
+  int two;
+  int three;
+  int four;
+  int five;
+  int six[6];
 } hello_world_output_databuf_t;
 
 /*
