@@ -11,30 +11,27 @@
 #include <errno.h>
 
 #include "hashpipe.h"
-#include "hello_world_databuf.h"
+#include "example_databuf.h"
 
 static void *run(hashpipe_thread_args_t * args)
 {
-	hello_world_output_databuf_t *db = (hello_world_output_databuf_t *)args->obuf;
+	fprintf(stderr, "catcher's ibuf address: %p\n", (void *)&(*(args->ibuf)));
+	example_databuf_t *db = (example_databuf_t *)args->ibuf;
 	hashpipe_status_t st = args->st;
 	const char * status_key = args->thread_desc->skey;
 
 	int rv;
-// 	uint64_t mcnt = 0;
-//     uint64_t *data;
-//     int m,f,t,c;
 	int block_idx = 0;
-	
+
 	while (run_threads())
 	{
-		fprintf(stderr, "Hello, world!\n");
-		sleep(1);
+		
 
 		hashpipe_status_lock_safe(&st);
         hputs(st.buf, status_key, "waiting");
         hashpipe_status_unlock_safe(&st);
 
-		while ((rv=hello_world_output_databuf_wait_free(db, block_idx)) != HASHPIPE_OK) {
+		while ((rv=example_databuf_wait_filled(db, block_idx)) != HASHPIPE_OK) {
               if (rv==HASHPIPE_TIMEOUT) {
                   hashpipe_status_lock_safe(&st);
                   hputs(st.buf, status_key, "blocked");
@@ -52,19 +49,14 @@ static void *run(hashpipe_thread_args_t * args)
 		hputi4(st.buf, "NETBKOUT", block_idx);
 		hashpipe_status_unlock_safe(&st);
 
-		db->one = 1;
-		db->two = 2;
-		db->three = 3;
-		db->four = 4;
-		db->five = 5;
+		fprintf(stderr, "Catching!\n");
+		sleep(1);
 
-		int i;
-		for (i = 0; i < 6; i++) {
-			db->six[i] = 6;
-		}
+		fprintf(stderr, "one: %d\n", db->one);
+		fprintf(stderr, "two: %d\n", db->two);
 
 		// Mark block as full
-        hello_world_output_databuf_set_filled(db, block_idx);
+        example_databuf_set_free(db, block_idx);
 
         // Setup for next block
 //         block_idx = (block_idx + 1) % 8;
@@ -73,20 +65,20 @@ static void *run(hashpipe_thread_args_t * args)
         /* Will exit if thread has been cancelled */
         pthread_testcancel();
 	}
-	
+
 	return NULL;
 }
 
-static hashpipe_thread_desc_t hello_world_thread = {
-    name: "hello_world_thread",
-    skey: "HELLSTAT",
+static hashpipe_thread_desc_t catcher_thread = {
+    name: "catcher_thread",
+    skey: "CATCSTAT",
     init: NULL,
     run:  run,
-    ibuf_desc: {NULL},
-    obuf_desc: {hello_world_output_databuf_create}
+    ibuf_desc: {example_databuf_create},
+    obuf_desc: {NULL}
 };
 
 static __attribute__((constructor)) void ctor()
 {
-  register_hashpipe_thread(&hello_world_thread);
+  register_hashpipe_thread(&catcher_thread);
 }

@@ -1,4 +1,4 @@
-/* hello_world_databuf.c
+/* pitcher_databuf.c
  *
  * Routines for creating and accessing main data transfer
  * buffer in shared memory.
@@ -13,9 +13,9 @@
 #include <errno.h>
 #include <time.h>
 
-#include "hello_world_databuf.h"
+#include "pitcher_databuf.h"
 
-hashpipe_databuf_t *hello_world_output_databuf_create(int instance_id, int databuf_id)
+hashpipe_databuf_t *pitcher_output_databuf_create(int instance_id, int databuf_id)
 {
     /* Calc databuf sizes */
     size_t header_size = sizeof(hashpipe_databuf_t);
