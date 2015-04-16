@@ -26,6 +26,7 @@ static void *run(hashpipe_thread_args_t * args)
 
 	int rv;
 	int block_idx = 0;
+	int counter = -1;
 	
 	while (run_threads())
 	{
@@ -51,14 +52,18 @@ static void *run(hashpipe_thread_args_t * args)
 // 		hputi4(st.buf, "NETBKOUT", block_idx);
 		hashpipe_status_unlock_safe(&st);
 
+		
+		sleep(1);
 		fprintf(stderr, "\nPitching!\n");
-		sleep(5);
-
+		
+		db->block[block_idx].counter = ++counter;
 		db->block[block_idx].one   = 1 * (block_idx + 1);
 		db->block[block_idx].two   = 2 * (block_idx + 1);
 		db->block[block_idx].three = 3 * (block_idx + 1);
 		db->block[block_idx].four  = 4 * (block_idx + 1);
 		db->block[block_idx].five  = 5 * (block_idx + 1);
+
+		fprintf(stderr, "Pitcher counter: %d\n", counter);
 
 		int i;
 		for (i = 0; i < 6; i++) {
@@ -70,7 +75,7 @@ static void *run(hashpipe_thread_args_t * args)
 
         // Setup for next block
         block_idx = (block_idx + 1) % NUM_BLOCKS;
-		fprintf(stderr, "pitcher's block_idx is now: %d\n", block_idx);
+// 		fprintf(stderr, "pitcher's block_idx is now: %d\n", block_idx);
 
         /* Will exit if thread has been cancelled */
         pthread_testcancel();

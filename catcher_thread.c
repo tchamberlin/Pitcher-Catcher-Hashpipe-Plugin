@@ -22,6 +22,8 @@ static void *run(hashpipe_thread_args_t * args)
 
 	int rv;
 	int block_idx = 0;
+	int counter = 0;
+	int last_counter = -1;
 
 	while (run_threads())
 	{
@@ -47,9 +49,18 @@ static void *run(hashpipe_thread_args_t * args)
 // 		hputi4(st.buf, "NETBKOUT", block_idx);
 		hashpipe_status_unlock_safe(&st);
 
-		fprintf(stderr, "Catching!\n");
-		sleep(5);
+		
+// 		sleep(1);
 
+		fprintf(stderr, "Catching!\n");
+		counter = db->block[block_idx].counter;
+		fprintf(stderr, "Catcher counter: %d\n", counter);
+		if (last_counter != counter - 1) {
+			fprintf(stderr, "COUNTER MISMATCH\n");
+			break;
+		}
+
+		last_counter = counter;
 		fprintf(stderr, "one: %d\n", db->block[block_idx].one);
 		fprintf(stderr, "two: %d\n", db->block[block_idx].two);
 		fprintf(stderr, "three: %d\n", db->block[block_idx].three);
@@ -66,7 +77,7 @@ static void *run(hashpipe_thread_args_t * args)
 
         // Setup for next block
 		block_idx = (block_idx + 1) % NUM_BLOCKS;
-		fprintf(stderr, "catcher's block_idx is now: %d\n", block_idx);
+// 		fprintf(stderr, "catcher's block_idx is now: %d\n", block_idx);
 		
 
         /* Will exit if thread has been cancelled */
