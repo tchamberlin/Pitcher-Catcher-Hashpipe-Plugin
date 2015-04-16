@@ -19,7 +19,7 @@
 
 static void *run(hashpipe_thread_args_t * args)
 {
-	fprintf(stderr, "pitcher's ibuf address: %p\n", (void *)&(*(args->obuf)));
+	fprintf(stderr, "pitcher's obuf address: %p\n", (void *) &(*(args->obuf)));
 	example_databuf_t *db = (example_databuf_t *)args->obuf;
 	hashpipe_status_t st = args->st;
 	const char * status_key = args->thread_desc->skey;
@@ -29,8 +29,6 @@ static void *run(hashpipe_thread_args_t * args)
 	
 	while (run_threads())
 	{
-		
-
 		hashpipe_status_lock_safe(&st);
         hputs(st.buf, status_key, "waiting");
         hashpipe_status_unlock_safe(&st);
@@ -50,29 +48,29 @@ static void *run(hashpipe_thread_args_t * args)
 
 		hashpipe_status_lock_safe(&st);
 		hputs(st.buf, status_key, "sending");
-		hputi4(st.buf, "NETBKOUT", block_idx);
+// 		hputi4(st.buf, "NETBKOUT", block_idx);
 		hashpipe_status_unlock_safe(&st);
 
-		fprintf(stderr, "Pitching!\n");
-		sleep(1);
+		fprintf(stderr, "\nPitching!\n");
+		sleep(5);
 
-		db->one = 1;
-		db->two = 2;
-		db->three = 3;
-		db->four = 4;
-		db->five = 5;
+		db->block[block_idx].one   = 1 * (block_idx + 1);
+		db->block[block_idx].two   = 2 * (block_idx + 1);
+		db->block[block_idx].three = 3 * (block_idx + 1);
+		db->block[block_idx].four  = 4 * (block_idx + 1);
+		db->block[block_idx].five  = 5 * (block_idx + 1);
 
 		int i;
 		for (i = 0; i < 6; i++) {
-			db->six[i] = 6;
+			db->block[block_idx].six[i] = i * (block_idx + 1);
 		}
 
 		// Mark block as full
         example_databuf_set_filled(db, block_idx);
 
         // Setup for next block
-//         block_idx = (block_idx + 1) % 8;
-// 		fprintf(stderr, "block_idx is now: %d\n", block_idx);
+        block_idx = (block_idx + 1) % NUM_BLOCKS;
+		fprintf(stderr, "pitcher's block_idx is now: %d\n", block_idx);
 
         /* Will exit if thread has been cancelled */
         pthread_testcancel();
