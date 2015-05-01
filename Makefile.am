@@ -1,36 +1,25 @@
-ACLOCAL_AMFLAGS = -I m4
-AM_CPPFLAGS     =
+# Copyright (C) 2015 Associated Universities, Inc. Washington DC, USA.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# Correspondence concerning GBT software should be addressed as follows:
+# GBT Operations
+# National Radio Astronomy Observatory
+# P. O. Box 2
+# Green Bank, WV 24944-0002 USA
 
-AM_CPPFLAGS += -I"@HASHPIPE_INCDIR@"
-# AM_CPPFLAGS += -I"@XGPU_INCDIR@"
-
-# AM_CFLAGS is used for all C compiles
-AM_CFLAGS = -ggdb -fPIC -O3 -Wall -Werror -fno-strict-aliasing -mavx
-
-# Convenience variables to group source files
-example_databuf = example_databuf.h \
-	        example_databuf.c
-
-example = pitcher_thread.c \
-	  catcher_thread.c
-
-# This is the paper_gpu plugin itself
-lib_LTLIBRARIES = example.la
-example_la_SOURCES = $(example) $(example_databuf)
-example_la_LIBADD   = -lrt
-example_la_LDFLAGS  = -avoid-version -module -shared -export-dynamic
-# example_la_LDFLAGS += -L"@XGPU_LIBDIR@" -Wl,-rpath,"@XGPU_LIBDIR@"
-example_la_LDFLAGS += -L"@HASHPIPE_LIBDIR@" -Wl,-rpath,"@HASHPIPE_LIBDIR@"
-
-# Installed scripts
-# dist_bin_SCRIPTS = example_init.sh
-
-# Non-installed test programs
-# noinst_PROGRAMS = paper_fluff_test
-# paper_fluff_test_SOURCES = paper_fluff_test.c $(paper_fluff)
-# The paper_fluff_test_CFLAGS is an autotools workaround.
-# http://www.gnu.org/software/automake/manual/html_node/Objects-created-both-with-libtool-and-without.html
-# paper_fluff_test_CFLAGS = $(AM_CFLAGS)
-# paper_fluff_test_LDADD = -lrt
-
-# vi: set ts=8 noet :
+ACLOCAL_AMFLAGS = -I m4 -I config
+SUBDIRS = src
+# EXTRA_DIST = autogen.sh

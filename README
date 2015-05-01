@@ -1,0 +1,21 @@
+This is the Pitcher Catcher example Hashpipe plugin. It is intended to be used only as a guide to developing your own plugin; it has no intrinsic utility.
+
+There is a full guide for installing this plugin located here: https://safe.nrao.edu/wiki/bin/view/GB/Software/CreatingAHashpipePlugin
+
+When you build this plugin, make sure that you are installing your plugin to the hashpipe installation directory.
+For example, I installed hashpipe to "/home/sandboxes/tchamber/paper/commoninstall" using "./configure --prefix=/home/sandboxes/tchamber/paper/commoninstall".
+So, when I install the fake_gpu plugin, I will also install it to /home/sandboxes/tchamber/paper/commoninstall.
+I will use $INSTALLDIR to refer to this common installation directory.
+
+To build:
+    From the root of Pitcher-Catcher-Hashpipe-Plugin:
+        $ mkdir build config
+        $ autoreconf -is
+        $ cd build
+        $ ../configure --prefix=$INSTALLDIR --with-hashpipe=$INSTALLDIR
+        $ make
+        $ make install
+
+To run:
+    After adding $INSTALLDIR to your PATH:
+        $ clean_ipc; taskset 0x0606 hashpipe -p pitcher_catcher -I 3 -o BINDHOST=px1-2.gb.nrao.edu -o GPUDEV=0 -o XID=0 -c 2 pitcher_thread -c 3 catcher_thread
